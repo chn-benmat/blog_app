@@ -5,7 +5,8 @@ import 'package:blog_app/features/auth/presentation/widgets/auth_gradient_button
 import 'package:flutter/material.dart';
 
 class SignUpPage extends StatefulWidget {
-  static route() => MaterialPageRoute(
+  // สร้างเส้นทางสำหรับนำทางไปยังหน้าสมัครสมาชิก
+  static MaterialPageRoute<void> route() => MaterialPageRoute(
     builder: (context) => const SignUpPage(),
   );
   const SignUpPage({super.key});
@@ -64,6 +65,7 @@ class _SignUpPageState extends State<SignUpPage> {
               bunttonText: "Sign Up",
             ),
             const SizedBox(height: 20),
+             // เมื่อผู้ใช้แตะจะนำทางไปยังหน้าเข้าสู่ระบบ
             GestureDetector(
               onTap: () {
                 Navigator.push(context, LoginPage.route());
