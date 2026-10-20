@@ -32,6 +32,7 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Column(
@@ -65,7 +66,7 @@ class _SignUpPageState extends State<SignUpPage> {
               bunttonText: "Sign Up",
             ),
             const SizedBox(height: 20),
-             // เมื่อผู้ใช้แตะจะนำทางไปยังหน้าเข้าสู่ระบบ
+            // เมื่อผู้ใช้แตะจะนำทางไปยังหน้าเข้าสู่ระบบ
             GestureDetector(
               onTap: () {
                 Navigator.push(context, LoginPage.route());
