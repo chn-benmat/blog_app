@@ -1,39 +1,21 @@
-import 'package:blog_app/core/secrets/app_secrets.dart';
 import 'package:blog_app/core/theme/theme.dart';
-import 'package:blog_app/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:blog_app/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:blog_app/features/auth/domain/usecases/user_sign_up.dart';
 import 'package:blog_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:blog_app/features/auth/presentation/pages/login_page.dart';
+import 'package:blog_app/init_dependencies.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
-  // เตรียม Flutter ก่อนเริ่มทำงานแบบ Async
+  // เตรียม Flutter และตั้งค่า Dependencies
   WidgetsFlutterBinding.ensureInitialized();
+  await initDependencies();
 
-  // โหลด Environment Variables
-  await dotenv.load(fileName: '.env.local');
-
-  // เชื่อมต่อกับ Supabase
-  final supabase = await Supabase.initialize(
-    url: AppSecrets.supabaseUrl,
-    publishableKey: AppSecrets.supabasePublishableKey,
-  );
-
-  // เริ่มต้นแอปและกำหนด Bloc ที่ใช้งานร่วมกัน
+  // เริ่มแอปพร้อมกำหนด Bloc
   runApp(
     MultiBlocProvider(
       providers: [
-        // กำหนด AuthBloc พร้อม Dependencies สำหรับสมัครสมาชิก
         BlocProvider(
-          create: (_) => AuthBloc(
-            userSignUp: UserSignUp(
-              AuthRepositoryImpl(AuthRemoteDataSourceImpl(supabase.client)),
-            ),
-          ),
+          create: (_) => serviceLocator<AuthBloc>(),
         ),
       ],
       child: const MyApp(),
@@ -44,7 +26,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // กำหนดการตั้งค่าและหน้าเริ่มต้นของแอป
+  // กำหนดธีมและหน้าเริ่มต้นของแอป
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

@@ -54,8 +54,9 @@ class _LoginPageState extends State<LoginPage> {
               isObscureText: true,
             ),
             const SizedBox(height: 20),
-            const AuthGradientButton(
+            AuthGradientButton(
               bunttonText: "Sign In",
+              onPressed: () {},
             ),
             const SizedBox(height: 20),
             // เมื่อผู้ใช้แตะจะนำทางไปยังหน้าสมัครสมาชิก

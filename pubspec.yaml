@@ -12,14 +12,11 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  # จัดการผลลัพธ์สำเร็จ ข้อผิดพลาด และค่า null
-  fpdart: ^1.2.0
-  # เชื่อมต่อ Supabase สำหรับจัดการฐานข้อมูล ผู้ใช้ และไฟล์
-  supabase_flutter: ^2.18.3
-  # จัดการตัวแปรสภาพแวดล้อม (.env)
-  flutter_dotenv: ^6.0.1
-  # จัดการ State และ Business Logic
-  flutter_bloc: ^9.1.1
+  fpdart: ^1.2.0 # จัดการผลลัพธ์สำเร็จ ข้อผิดพลาด และค่า null
+  supabase_flutter: ^2.18.3 # เชื่อมต่อ Supabase สำหรับจัดการฐานข้อมูล ผู้ใช้ และไฟล์
+  flutter_dotenv: ^6.0.1 # จัดการตัวแปรสภาพแวดล้อม (.env)
+  flutter_bloc: ^9.1.1 # จัดการ State และ Business Logic
+  get_it: ^9.3.0 # จัดการและเรียกใช้ Class หรือ Service ร่วมกันภายในแอป
 
 dev_dependencies:
   flutter_test:
