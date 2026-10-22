@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
-  // เตรียม Flutter และตั้งค่า Dependencies
+  // เตรียม Flutter ก่อนโหลดค่าตั้งค่าและบริการภายนอก
   WidgetsFlutterBinding.ensureInitialized();
   await initDependencies();
 
-  // เริ่มแอปพร้อมกำหนด Bloc
+  // ให้หน้าจอภายในแอปเข้าถึง AuthBloc ตัวเดียวกัน
   runApp(
     MultiBlocProvider(
       providers: [
@@ -23,10 +23,10 @@ void main() async {
   );
 }
 
+// กำหนดธีมและเปิดหน้าเข้าสู่ระบบเป็นหน้าแรก
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // กำหนดธีมและหน้าเริ่มต้นของแอป
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

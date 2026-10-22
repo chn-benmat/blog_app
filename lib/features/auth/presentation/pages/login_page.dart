@@ -4,6 +4,7 @@ import 'package:blog_app/features/auth/presentation/widgets/auth_field.dart';
 import 'package:blog_app/features/auth/presentation/widgets/auth_gradient_button.dart';
 import 'package:flutter/material.dart';
 
+// แสดงช่องอีเมล รหัสผ่าน และทางไปหน้าสมัครสมาชิก
 class LoginPage extends StatefulWidget {
   // สร้างเส้นทางสำหรับนำทางไปยังหน้าเข้าสู่ระบบ
   static MaterialPageRoute<void> route() => MaterialPageRoute(
@@ -15,13 +16,17 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
+// เก็บค่าช่องกรอกและสร้างฟอร์มเข้าสู่ระบบ
 class _LoginPageState extends State<LoginPage> {
+  // ใช้อ่านอีเมลและรหัสผ่านที่ผู้ใช้กรอก
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  // เตรียมไว้ตรวจข้อมูลใน Form แต่หน้านี้ยังไม่ได้เชื่อมกับ Form
   final formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
+    // คืนทรัพยากรของช่องกรอกเมื่อหน้านี้ถูกปิด
     emailController.dispose();
     passwordController.dispose();
     super.dispose();

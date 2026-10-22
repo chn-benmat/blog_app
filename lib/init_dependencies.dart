@@ -8,14 +8,15 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_it/get_it.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-// ตัวจัดการ Dependencies
+// เก็บวิธีสร้างคลาส เพื่อให้ส่วนอื่นเรียกใช้ผ่าน serviceLocator ได้
 final serviceLocator = GetIt.instance;
 
+// ลงทะเบียนคลาส โหลดค่าตั้งค่า และเตรียม Supabase ก่อนเปิดแอป
 Future<void> initDependencies() async {
-  // ลงทะเบียน Dependencies ของระบบ Auth
+  // ลงทะเบียนวิธีสร้างคลาส Auth โดยยังไม่สร้างทันที
   _initAuth();
 
-  // โหลดค่าจากไฟล์ Environment
+  // โหลด .env.local ก่อนอ่านค่าการเชื่อมต่อ
   await dotenv.load(fileName: '.env.local');
 
   // เริ่มต้นการเชื่อมต่อ Supabase
@@ -24,33 +25,34 @@ Future<void> initDependencies() async {
     publishableKey: AppSecrets.supabasePublishableKey,
   );
 
-  // ลงทะเบียน Supabase Client
+  // เก็บวิธีเรียก Supabase Client เพื่อให้คลาสอื่นใช้ตัวเดียวกัน
   serviceLocator.registerLazySingleton(() => supabase.client);
 }
 
+// ลงทะเบียนวิธีสร้างคลาสสมัครสมาชิก พร้อมคลาสที่แต่ละตัวต้องใช้
 void _initAuth() {
-  // จัดการการเชื่อมต่อข้อมูล Auth
+  // สร้าง Data source ใหม่เมื่อเรียกใช้ พร้อมส่ง Supabase Client ให้
   serviceLocator.registerFactory<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(
       serviceLocator(),
     ),
   );
 
-  // จัดการ Repository ของ Auth
+  // สร้าง Repository ใหม่เมื่อเรียกใช้ พร้อมส่ง Data source ให้
   serviceLocator.registerFactory<AuthRepository>(
     () => AuthRepositoryImpl(
       serviceLocator(),
     ),
   );
 
-  // จัดการ Use Case สมัครสมาชิก
+  // สร้าง Use case ใหม่เมื่อเรียกใช้ พร้อมส่ง Repository ให้
   serviceLocator.registerFactory(
     () => UserSignUp(
       serviceLocator(),
     ),
   );
 
-  // จัดการสถานะ Auth ด้วย Bloc
+  // สร้าง AuthBloc ครั้งแรกที่เรียกใช้ แล้วใช้ตัวเดิมร่วมกัน
   serviceLocator.registerLazySingleton(
     () => AuthBloc(
       userSignUp: serviceLocator(),
