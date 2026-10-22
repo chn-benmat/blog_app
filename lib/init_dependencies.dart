@@ -51,7 +51,7 @@ void _initAuth() {
   );
 
   // จัดการสถานะ Auth ด้วย Bloc
-  serviceLocator.registerSingleton(
+  serviceLocator.registerLazySingleton(
     () => AuthBloc(
       userSignUp: serviceLocator(),
     ),
