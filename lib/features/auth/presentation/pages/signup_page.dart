@@ -8,7 +8,6 @@ import 'package:blog_app/features/auth/presentation/widgets/auth_gradient_button
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-// แสดงฟอร์มสมัครสมาชิก ส่งข้อมูลให้ Bloc และแสดงผลระหว่างรอหรือเมื่อผิดพลาด
 class SignUpPage extends StatefulWidget {
   // สร้างเส้นทางสำหรับนำทางไปยังหน้าสมัครสมาชิก
   static MaterialPageRoute<void> route() => MaterialPageRoute(
@@ -51,10 +50,13 @@ class _SignUpPageState extends State<SignUpPage> {
               showSnackBar(context, state.message);
             }
           },
-          // แสดงตัวโหลดระหว่างรอผล แล้วกลับมาแสดงฟอร์มในสถานะอื่น
           builder: (context, state) {
             if (state is AuthLoading) {
+              // แสดงตัวโหลดระหว่างรอผล
               return const Loader();
+            } else if (state is AuthSuccess) {
+              // สมัครสำเร็จกลับหน้า Login หากล้มเหลวแสดงข้อความผิดพลาด
+              Navigator.pop(context);
             }
             return Form(
               key: formKey,

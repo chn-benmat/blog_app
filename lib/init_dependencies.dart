@@ -2,6 +2,7 @@ import 'package:blog_app/core/secrets/app_secrets.dart';
 import 'package:blog_app/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:blog_app/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:blog_app/features/auth/domain/repository/auth_repository.dart';
+import 'package:blog_app/features/auth/domain/usecases/user_login.dart';
 import 'package:blog_app/features/auth/domain/usecases/user_sign_up.dart';
 import 'package:blog_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -29,7 +30,7 @@ Future<void> initDependencies() async {
   serviceLocator.registerLazySingleton(() => supabase.client);
 }
 
-// ลงทะเบียนวิธีสร้างคลาสสมัครสมาชิก พร้อมคลาสที่แต่ละตัวต้องใช้
+// ลงทะเบียนคลาสสำหรับสมัครสมาชิกและเข้าสู่ระบบ พร้อมคลาสที่ต้องใช้
 void _initAuth() {
   // สร้าง Data source ใหม่เมื่อเรียกใช้ พร้อมส่ง Supabase Client ให้
   serviceLocator.registerFactory<AuthRemoteDataSource>(
@@ -45,9 +46,16 @@ void _initAuth() {
     ),
   );
 
-  // สร้าง Use case ใหม่เมื่อเรียกใช้ พร้อมส่ง Repository ให้
+  // สร้าง Use case สมัครสมาชิกใหม่เมื่อเรียกใช้ พร้อมส่ง Repository ให้
   serviceLocator.registerFactory(
     () => UserSignUp(
+      serviceLocator(),
+    ),
+  );
+
+  // สร้าง Use case เข้าสู่ระบบใหม่เมื่อเรียกใช้ พร้อมส่ง Repository ให้
+  serviceLocator.registerFactory(
+    () => UserLogin(
       serviceLocator(),
     ),
   );
@@ -56,6 +64,7 @@ void _initAuth() {
   serviceLocator.registerLazySingleton(
     () => AuthBloc(
       userSignUp: serviceLocator(),
+      userLogin: serviceLocator(),
     ),
   );
 }
