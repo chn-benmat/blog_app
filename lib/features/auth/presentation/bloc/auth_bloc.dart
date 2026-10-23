@@ -1,4 +1,6 @@
+import 'package:blog_app/core/usecase/usecase.dart';
 import 'package:blog_app/features/auth/domain/entities/user.dart';
+import 'package:blog_app/features/auth/domain/usecases/current_user.dart';
 import 'package:blog_app/features/auth/domain/usecases/user_sign_up.dart';
 import 'package:blog_app/features/auth/domain/usecases/user_login.dart';
 import 'package:flutter/material.dart';
@@ -7,23 +9,30 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 part 'auth_event.dart';
 part 'auth_state.dart';
 
-// จัดการสมัครสมาชิกและเข้าสู่ระบบ พร้อมส่งสถานะกลับให้หน้าจอ
+// จัดการสมัครสมาชิก เข้าสู่ระบบ และตรวจสอบผู้ใช้ปัจจุบัน พร้อมส่งสถานะให้หน้าจอ
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  // Use case สำหรับเหตุการณ์สมัครสมาชิกและเข้าสู่ระบบ
+  // Use case สำหรับสมัครสมาชิก เข้าสู่ระบบ และอ่านผู้ใช้จาก session
   final UserSignUp _userSignUp;
   final UserLogin _userLogin;
+  final CurrentUser _currentUser;
   AuthBloc({
     required UserSignUp userSignUp,
     required UserLogin userLogin,
+    required CurrentUser currentUser,
   }) : _userSignUp = userSignUp,
        _userLogin = userLogin,
+       _currentUser = currentUser,
        super(AuthInitial()) {
-    // จับคู่เหตุการณ์จากหน้าจอกับตัวจัดการแต่ละงาน
+    // จับคู่เหตุการณ์สมัครสมาชิก เข้าสู่ระบบ และตรวจสอบผู้ใช้เมื่อเปิดแอป
     on<AuthSignUp>(_onAuthSigUp);
     on<AuthLogin>(_onAuthLogin);
+    on<AuthIsUserLoggedIn>(_isUserLoggedIn);
   }
 
-  void _onAuthSigUp(AuthSignUp event, Emitter<AuthState> emit) async {
+  void _onAuthSigUp(
+    AuthSignUp event,
+    Emitter<AuthState> emit,
+  ) async {
     // ให้หน้าจอแสดงตัวโหลดระหว่างรอผล
     emit(AuthLoading());
     // ส่งข้อมูลให้ Use case ดำเนินการสมัครสมาชิก
@@ -44,7 +53,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  void _onAuthLogin(AuthLogin event, Emitter<AuthState> emit) async {
+  void _onAuthLogin(
+    AuthLogin event,
+    Emitter<AuthState> emit,
+  ) async {
     // ให้หน้าจอแสดงตัวโหลดระหว่างรอผล
     emit(AuthLoading());
 
@@ -60,6 +72,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     res.fold(
       (failure) => emit(AuthFailure(failure.message)),
       (user) {
+        print(user.name);
+        emit(AuthSuccess(user));
+      },
+    );
+  }
+
+  // ตรวจสอบ session เดิมผ่าน Use case โดยไม่ต้องกรอกข้อมูลเข้าสู่ระบบซ้ำ
+  void _isUserLoggedIn(
+    AuthIsUserLoggedIn event,
+    Emitter<AuthState> emit,
+  ) async {
+    final res = await _currentUser(NoParams());
+
+    // ส่ง AuthFailure หากไม่มีผู้ใช้หรืออ่านข้อมูลไม่ได้ และ AuthSuccess เมื่อพบผู้ใช้
+    res.fold(
+      (failure) => emit(AuthFailure(failure.message)),
+      (user) {
+        print(user.id);
         emit(AuthSuccess(user));
       },
     );

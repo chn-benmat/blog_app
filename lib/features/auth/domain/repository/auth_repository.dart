@@ -2,7 +2,7 @@ import 'package:blog_app/core/error/failures.dart';
 import 'package:blog_app/features/auth/domain/entities/user.dart';
 import 'package:fpdart/fpdart.dart';
 
-// กำหนดว่าคลาสจัดการข้อมูลผู้ใช้ต้องสมัครสมาชิกและเข้าสู่ระบบได้
+// กำหนดการสมัครสมาชิก เข้าสู่ระบบ และอ่านข้อมูลผู้ใช้ปัจจุบัน
 abstract interface class AuthRepository {
   // สมัครสมาชิกแล้วคืน Failure (ล้มเหลว) หรือ User (สำเร็จ)
   Future<Either<Failure, User>> signUpWithEmailPassword({
@@ -15,4 +15,7 @@ abstract interface class AuthRepository {
     required String email,
     required String password,
   });
+
+  // คืนผู้ใช้จาก session ปัจจุบัน หรือ Failure หากไม่มีผู้ใช้หรือเกิดข้อผิดพลาด
+  Future<Either<Failure, User>> curentUser();
 }

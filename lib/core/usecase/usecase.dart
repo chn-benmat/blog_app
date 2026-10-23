@@ -6,3 +6,6 @@ abstract interface class UseCase<SuccessType, Params> {
   // เรียกงานด้วย params และรอผลสำเร็จหรือข้อผิดพลาด
   Future<Either<Failure, SuccessType>> call(Params params);
 }
+
+// ใช้กับ Use case ที่ไม่ต้องรับข้อมูล เช่น การอ่านผู้ใช้จาก session ปัจจุบัน
+class NoParams {}

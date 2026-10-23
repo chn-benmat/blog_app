@@ -9,12 +9,12 @@ sealed class AuthState {
 // เริ่มต้นก่อนมีคำขอยืนยันตัวตน
 final class AuthInitial extends AuthState {}
 
-// กำลังรอผลสมัครสมาชิก ให้หน้าจอแสดงตัวโหลด
+// กำลังรอผลสมัครสมาชิกหรือเข้าสู่ระบบ ให้หน้าจอแสดงตัวโหลด
 final class AuthLoading extends AuthState {}
 
-// ทำรายการสำเร็จ พร้อมข้อมูลผู้ใช้สำหรับขั้นตอนถัดไป
+// สมัครสมาชิก เข้าสู่ระบบ หรืออ่านผู้ใช้ปัจจุบันสำเร็จ พร้อมข้อมูลผู้ใช้
 final class AuthSuccess extends AuthState {
-  // ข้อมูลผู้ใช้ที่ได้หลังทำรายการสำเร็จ
+  // ข้อมูลผู้ใช้ที่ได้จากการยืนยันตัวตนหรืออ่าน session ปัจจุบัน
   final User user;
   const AuthSuccess(this.user);
 }

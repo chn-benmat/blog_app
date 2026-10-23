@@ -26,3 +26,6 @@ final class AuthLogin extends AuthEvent {
     required this.password,
   });
 }
+
+// ให้ Bloc ตรวจสอบผู้ใช้จาก session ที่มีอยู่เมื่อเปิดแอป
+final class AuthIsUserLoggedIn extends AuthEvent {}

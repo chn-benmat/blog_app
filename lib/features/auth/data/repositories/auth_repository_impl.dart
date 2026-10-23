@@ -6,11 +6,28 @@ import 'package:blog_app/features/auth/domain/repository/auth_repository.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 
-// จัดการผลสมัครสมาชิกและเข้าสู่ระบบให้เป็นข้อมูลผู้ใช้หรือข้อผิดพลาด
+// แปลงผลสมัครสมาชิก เข้าสู่ระบบ และอ่านผู้ใช้ปัจจุบันเป็น User หรือ Failure
 class AuthRepositoryImpl implements AuthRepository {
-  // ติดต่อเซิร์ฟเวอร์เพื่อสมัครสมาชิกและเข้าสู่ระบบ
+  // ติดต่อ Data source เพื่อยืนยันตัวตนและอ่านข้อมูลผู้ใช้
   final AuthRemoteDataSource remoteDataSource;
   AuthRepositoryImpl(this.remoteDataSource);
+
+  // คืนผู้ใช้ปัจจุบัน หรือ Failure เมื่อไม่มี session หรืออ่านข้อมูลไม่สำเร็จ
+  @override
+  Future<Either<Failure, User>> curentUser() async {
+    try {
+      final user = await remoteDataSource.getCurrentUserData();
+
+      if (user == null) {
+        return left(Failure('User not logged in'));
+      }
+
+      return right(user);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
+
   @override
   Future<Either<Failure, User>> loginWithEmailPassword({
     required String email,

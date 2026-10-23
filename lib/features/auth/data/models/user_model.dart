@@ -17,4 +17,17 @@ class UserModel extends User {
       email: map['email'] ?? '',
     );
   }
+
+  // สร้างข้อมูลผู้ใช้ชุดใหม่ โดยคงค่าเดิมในช่องที่ไม่ได้ส่งค่าหรือส่ง null
+  UserModel copyWith({
+    String? id,
+    String? name,
+    String? email,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+    );
+  }
 }

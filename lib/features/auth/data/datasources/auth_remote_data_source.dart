@@ -2,8 +2,10 @@ import 'package:blog_app/core/error/exceptions.dart';
 import 'package:blog_app/features/auth/data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-// กำหนดการสมัครสมาชิกและเข้าสู่ระบบที่ Data source ต้องรองรับ
+// กำหนดการสมัครสมาชิก เข้าสู่ระบบ และอ่านผู้ใช้จาก session ปัจจุบัน
 abstract interface class AuthRemoteDataSource {
+  // คืน session ที่ Supabase เก็บอยู่ หรือ null หากไม่มี session
+  Session? get currentUserSession;
   // สมัครสมาชิกและคืนข้อมูลผู้ใช้จากเซิร์ฟเวอร์
   Future<UserModel> signUpWithEmailPassword({
     required String name,
@@ -15,13 +17,42 @@ abstract interface class AuthRemoteDataSource {
     required String email,
     required String password,
   });
+
+  // อ่านโปรไฟล์ของผู้ใช้ใน session หรือคืน null หากไม่มี session
+  Future<UserModel?> getCurrentUserData();
 }
 
 // ส่งคำขอไปยัง Supabase และคืนข้อมูลผู้ใช้ในรูปแบบ UserModel
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  // ใช้เรียกบริการสมัครสมาชิกและเข้าสู่ระบบของ Supabase
+  // ใช้บริการยืนยันตัวตนและอ่านข้อมูลโปรไฟล์จาก Supabase
   final SupabaseClient supabaseClient;
   AuthRemoteDataSourceImpl(this.supabaseClient);
+
+  @override
+  Session? get currentUserSession => supabaseClient.auth.currentSession;
+
+  @override
+  Future<UserModel?> getCurrentUserData() async {
+    try {
+      if (currentUserSession != null) {
+        // ใช้ ID ใน session เพื่ออ่านข้อมูลผู้ใช้จากตาราง profiles
+        final userData = await supabaseClient
+            .from('profiles')
+            .select()
+            .eq('id', currentUserSession!.user.id);
+
+        // ใช้อีเมลจาก session ประกอบกับข้อมูลโปรไฟล์ที่อ่านได้
+        return UserModel.fromJson(userData.first).copyWith(
+          email: currentUserSession!.user.email,
+        );
+      }
+
+      // ไม่มี session จึงไม่มีผู้ใช้ปัจจุบันให้ดึงข้อมูล
+      return null;
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
 
   @override
   Future<UserModel> loginWithEmailPassword({

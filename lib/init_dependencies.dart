@@ -2,6 +2,7 @@ import 'package:blog_app/core/secrets/app_secrets.dart';
 import 'package:blog_app/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:blog_app/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:blog_app/features/auth/domain/repository/auth_repository.dart';
+import 'package:blog_app/features/auth/domain/usecases/current_user.dart';
 import 'package:blog_app/features/auth/domain/usecases/user_login.dart';
 import 'package:blog_app/features/auth/domain/usecases/user_sign_up.dart';
 import 'package:blog_app/features/auth/presentation/bloc/auth_bloc.dart';
@@ -30,41 +31,45 @@ Future<void> initDependencies() async {
   serviceLocator.registerLazySingleton(() => supabase.client);
 }
 
-// ลงทะเบียนคลาสสำหรับสมัครสมาชิกและเข้าสู่ระบบ พร้อมคลาสที่ต้องใช้
+// ลงทะเบียนคลาสสำหรับสมัครสมาชิก เข้าสู่ระบบ และตรวจสอบผู้ใช้ปัจจุบัน
 void _initAuth() {
   // สร้าง Data source ใหม่เมื่อเรียกใช้ พร้อมส่ง Supabase Client ให้
-  serviceLocator.registerFactory<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(
-      serviceLocator(),
-    ),
-  );
-
-  // สร้าง Repository ใหม่เมื่อเรียกใช้ พร้อมส่ง Data source ให้
-  serviceLocator.registerFactory<AuthRepository>(
-    () => AuthRepositoryImpl(
-      serviceLocator(),
-    ),
-  );
-
-  // สร้าง Use case สมัครสมาชิกใหม่เมื่อเรียกใช้ พร้อมส่ง Repository ให้
-  serviceLocator.registerFactory(
-    () => UserSignUp(
-      serviceLocator(),
-    ),
-  );
-
-  // สร้าง Use case เข้าสู่ระบบใหม่เมื่อเรียกใช้ พร้อมส่ง Repository ให้
-  serviceLocator.registerFactory(
-    () => UserLogin(
-      serviceLocator(),
-    ),
-  );
-
-  // สร้าง AuthBloc ครั้งแรกที่เรียกใช้ แล้วใช้ตัวเดิมร่วมกัน
-  serviceLocator.registerLazySingleton(
-    () => AuthBloc(
-      userSignUp: serviceLocator(),
-      userLogin: serviceLocator(),
-    ),
-  );
+  serviceLocator
+    ..registerFactory<AuthRemoteDataSource>(
+      () => AuthRemoteDataSourceImpl(
+        serviceLocator(),
+      ),
+    )
+    // สร้าง Repository ใหม่เมื่อเรียกใช้ พร้อมส่ง Data source ให้
+    ..registerFactory<AuthRepository>(
+      () => AuthRepositoryImpl(
+        serviceLocator(),
+      ),
+    )
+    // สร้าง Use case สมัครสมาชิกใหม่เมื่อเรียกใช้ พร้อมส่ง Repository ให้
+    ..registerFactory(
+      () => UserSignUp(
+        serviceLocator(),
+      ),
+    )
+    // สร้าง Use case เข้าสู่ระบบใหม่เมื่อเรียกใช้ พร้อมส่ง Repository ให้
+    ..registerFactory(
+      () => UserLogin(
+        serviceLocator(),
+      ),
+    )
+    // สร้าง Use case อ่านผู้ใช้ปัจจุบันเมื่อเรียกใช้ พร้อมส่ง Repository ให้
+    ..registerFactory(
+      () => CurrentUser(
+        serviceLocator(),
+      ),
+    )
+    // สร้าง AuthBloc ครั้งแรกที่เรียกใช้ แล้วใช้ตัวเดิมร่วมกัน
+    ..registerLazySingleton(
+      () => AuthBloc(
+        userSignUp: serviceLocator(),
+        userLogin: serviceLocator(),
+        currentUser: serviceLocator(),
+      ),
+    );
 }

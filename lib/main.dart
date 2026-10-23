@@ -23,9 +23,20 @@ void main() async {
   );
 }
 
-// กำหนดธีมและเปิดหน้าเข้าสู่ระบบเป็นหน้าแรก
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    // ตรวจสอบ session เดิมหนึ่งครั้งเมื่อสร้าง State ของแอป
+    context.read<AuthBloc>().add(AuthIsUserLoggedIn());
+  }
 
   @override
   Widget build(BuildContext context) {
